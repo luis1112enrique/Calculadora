@@ -55,6 +55,7 @@ public class Calculadora {
                 arrayModificadoXnegativo.add(arregloAux[i]);
             }
             expresionPostfija = arrayModificadoXnegativo;
+            System.out.println(expresionPostfija);
         } 
         for (int i = 0; i < expresionPostfija.size(); i++) {
             if (ConvertirPostFijaInfija.esOperando(expresionPostfija.get(i))){
@@ -87,7 +88,7 @@ public class Calculadora {
     }
     
     public static void main(String[] args) {
-        Calculadora cal = new Calculadora ("-1.5+7*(5+1)-10");
+        Calculadora cal = new Calculadora ("(-3+5)^2");
         
         System.out.println(cal.evaluaExpresion());
     }
