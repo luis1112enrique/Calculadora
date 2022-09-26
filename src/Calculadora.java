@@ -1,63 +1,93 @@
-
 import java.util.ArrayList;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ * Integrantes del equipo de desarrollo:
+ *   · Luis Enrique Hernández Torres
+ *   · Francisco Ríos Rodríguez
+ *   · Emiliano Monroy Cruz
+ *   · Paula de la Isla Reyes
+ *   · Carlos Huerta Varela
+ * 
+ * Fecha [última modificación]:
+ *   · 21 de septiembre 2022
+ * 
+ * Proyecto:
+ *   · Calculadora básica
+ * 
+ * Descripción de la clase:
+ *   · Esta clase modela la calculadora básica como objeto.
  */
 
-/**
- *
- * @author luis1_0l42vo6
- */
 public class Calculadora {
-    private String expresion;
-    private ArrayList <String> expresionPostfija;   
+    
+    //Atributos
+    
+    private String expresion;   
     private PilaA <Double> pilaAux = new PilaA <Double> ();
     
-    public Calculadora(){
-        
+    //Funcionalidad
+    
+    /**
+     * constructor vacío
+     */
+    public Calculadora(){  
     }
-
+    
+    public Calculadora (String expresion){
+        this.expresion = expresion;
+    }
+    
+    /**
+     * getters y setters, funcionalidad básica
+     * @return String
+     */
     public String getExpresion() {
         return expresion;
     }
-      
-    public Calculadora (String expresion){
-        this.expresion = expresion;
-        this.expresionPostfija = convertirPostFijaInfija();
+    
+    public void setExpresion(String nuevaExpresion){
+        this.expresion = nuevaExpresion;
     }
     
-    private ArrayList<String> obtenerTokens (){ // PRIMERO REVISAR TODA LA SINTAXIS
-        return ObtieneTokens.obtieneTokens(getExpresion());      
-    }
+    /**
+     * en evaluaExpresion se va leyendo carácter por carácter la cadena y de acuerdo al signo, se lleva a cabo una operación
+     * @return String
+     */
     
-    private  ArrayList <String> convertirPostFijaInfija () {
-        return ConvertirPostFijaInfija.convierteInfijaApostfija(obtenerTokens());
-    }
-    
-    
-    public double evaluaExpresion (){
+    private String evaluaExpresion (){
         double resultado = 0;
+        boolean indeterminacion = false;
+        StringBuilder cad = new StringBuilder ();
+        ArrayList <String> guardaTokens; //= new ArrayList <String> ()
+        String [] arregloAux = new String [1000];
+        int contArreglo = 0;
         double operando1;
         double operando2;
-        ArrayList <String > arrayModificadoXnegativo = new ArrayList <String>();
-        String [] arregloAux = new String [100];
-        int contArreglo = 1;
+        String res;
+        ArrayList <String> expresionPostfija;
         
-        if (expresion.charAt(0) == '-' || expresion.charAt(0) == '+'){ // POR SI ALPRINCIO DE UNA EXPRESION DADA POR EL USUARIO EMPIEZA CON UN SIMBOLO POSITIVO O NEGATIVO
+        if (expresion.charAt(0) == '-'){
             arregloAux[0] = "0";
-            for (int i = 1; i <= expresionPostfija.size(); i++) {
-                arregloAux[i] = expresionPostfija.get(i-1);
-                contArreglo ++;
+            contArreglo ++;
+        }
+        for (int i = 0; i < expresion.length(); i++) {
+            if (expresion.charAt(i) == '(') {
+                arregloAux[contArreglo] =""+expresion.charAt(i);
+                contArreglo++;
+                arregloAux[contArreglo] = "0";        
             }
-            for (int i = 0 ; i < contArreglo ; i++){
-                arrayModificadoXnegativo.add(arregloAux[i]);
+            else{
+                arregloAux[contArreglo] = ""+expresion.charAt(i);
             }
-            expresionPostfija = arrayModificadoXnegativo;
-        } 
+            contArreglo++;
+        }
+        for (int j = 0; j < contArreglo; j++) {
+            cad.append(arregloAux[j]);
+        }
+        guardaTokens = MetodosImportantes.obtieneTokens(cad.toString());
+        expresionPostfija = MetodosImportantes.convierteInfijaAPostfija(guardaTokens); 
         for (int i = 0; i < expresionPostfija.size(); i++) {
-            if (ConvertirPostFijaInfija.esOperando(expresionPostfija.get(i))){
+            if (MetodosImportantes.esOperando(expresionPostfija.get(i))){
                 pilaAux.push(Double.parseDouble(expresionPostfija.get(i)));
             }
             else{
@@ -74,22 +104,41 @@ public class Calculadora {
                         resultado = (operando1 * operando2);
                         break;
                     case "/":
-                        resultado = (operando1 / operando2);
+                        if (operando2 == 0){
+                            indeterminacion  = true;
+                        }
+                        else{
+                            resultado = (operando1 / operando2);
+                        }
                         break;
                     case "^":
-                        resultado = (Math.pow(operando2, operando1));
+                        resultado = (Math.pow(operando1, operando2));
                         break;
                 }
                 pilaAux.push(resultado);
             }    
         }
-        return pilaAux.pop();
-    }
-    
-    public static void main(String[] args) {
-        Calculadora cal = new Calculadora ("-1.5+7*(5+1)-10");
+        if (indeterminacion){
+            res = "Indeterminado";
+        }
+        else{
+            res = ""+pilaAux.pop();
+        }
         
-        System.out.println(cal.evaluaExpresion());
+        return res;
     }
-}
+    /**
+     * en caso de que la sintaxis sea incorrecta, arroja un mensaje que lo indica
+     * @return, si la sintaxis es correcta, se evalua la expresion, de lo contrario se regresa el mensaje de "error de sintaxis"
+     */
+    public String procesarExpresion(){
+        String resp = "ERROR DE SINTAXIS";
+        
+        if(MetodosRevisionSintaxis.revisarSintaxis(expresion))
+            resp = evaluaExpresion();
+        
+        return resp;
+    }
 
+    
+}

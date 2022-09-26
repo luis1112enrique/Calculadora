@@ -1,4 +1,3 @@
-
 /**
  * Integrantes del equipo de desarrollo:
  *   · Luis Enrique Hernández Torres
@@ -14,17 +13,15 @@
  *   · Calculadora básica
  * 
  * Descripción de la clase:
- *   · Excepcion por si la pila esta vacia
+ *   · Esta interface sirve como la base para la creación de la estructura de
+ *     datos: pilaA.
  */
-public class ExcepcionColeccionVacia extends RuntimeException{
+
+public interface PilaADT <T>{
     
-    public ExcepcionColeccionVacia (){
-        
-    }
-    
-    public ExcepcionColeccionVacia (String message){
-        super (message);
-    }
-    
+    public void push(T dato);
+    public T pop();
+    public boolean isEmpty();
+    public T peek();
     
 }
